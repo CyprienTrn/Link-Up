@@ -1,4 +1,5 @@
 using link_up.Services;
+using LinkUpUser = link_up.Models.User;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -45,6 +46,14 @@ app.MapGet("/utilisateurs", async (CosmosService cosmosService) =>
     return utilisateurs;  // Retourne la liste des utilisateurs
 })
 .WithName("GetAllUtilisateurs")
+.WithOpenApi();
+
+app.MapPost("/utilisateurs", async (LinkUpUser user, CosmosService cosmosService) =>
+{
+    var createdUser = await cosmosService.CreateUserAsync(user);
+    return Results.Created($"/utilisateurs/{createdUser.Id}", createdUser);
+})
+.WithName("CreateUtilisateur")
 .WithOpenApi();
 
 app.Run();
