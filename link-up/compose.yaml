@@ -1,9 +1,0 @@
-version: "3.9" # Version du fichier Compose
-
-services:
-  app:
-    build:
-      context: . # Chemin vers le Dockerfile
-      dockerfile: Dockerfile
-    ports:
-      - "8080:5053" # Redirige le port 8080 sur l'hôte vers le port 5053 dans le conteneur
