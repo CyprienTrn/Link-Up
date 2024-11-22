@@ -8,7 +8,7 @@ WORKDIR /app
 COPY *.csproj ./
 
 # Restaurer les dépendances du projet
-# RUN dotnet restore
+RUN dotnet restore
 
 # Copier tout le reste du code source dans le conteneur
 COPY . ./
@@ -29,6 +29,6 @@ COPY --from=build-env /out .
 EXPOSE 5053
 
 # Commande pour démarrer l'application
-# ENTRYPOINT ["dotnet", "link-up.dll"]
+ENTRYPOINT ["dotnet", "link-up.dll"]
 
-CMD ["dotnet", "watch", "run"]
+# CMD ["dotnet", "watch", "run"]
