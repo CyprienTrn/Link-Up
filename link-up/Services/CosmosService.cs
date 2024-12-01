@@ -13,7 +13,8 @@ namespace link_up.Services
         public CosmosService(IConfiguration configuration)
         {
             // on charge la configuration depuis le appsettings.json
-            var cosmosSettings = configuration.GetSection("CosmosDb");
+            // var cosmosSettings = configuration.GetSection("CosmosDb");
+            var cosmosSettings = configuration.GetSection("CosmosDbCyp");
             string endpointUri = cosmosSettings["EndpointUri"];
             string primaryKey = cosmosSettings["PrimaryKey"];
             string databaseId = cosmosSettings["DatabaseId"];
@@ -21,16 +22,31 @@ namespace link_up.Services
 
             _cosmosClient = new CosmosClient(endpointUri, primaryKey, new CosmosClientOptions { ApplicationName = "LinkUpApp" });
             _database = _cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId).Result;
-            _container = _database.CreateContainerIfNotExistsAsync(containerId, "/Id").Result;
+            ContainerProperties containerProperties = new ContainerProperties()
+            {
+                Id = containerId,
+                PartitionKeyPath = "/user_id",
+            };
+            _container = _database.CreateContainerIfNotExistsAsync(containerProperties).Result;
+
+            // UserApp user = new()
+            // {
+            //     Email = "test@test.fr",
+            //     IsPrivate = true,
+            //     Name = "test",
+            //     Password = "test"
+            // };
+
+            // this.CreateUserAsync(user);
         }
 
-        public async Task<IEnumerable<User>> GetAllUtilisateursAsync()
+        public async Task<IEnumerable<UserApp>> GetAllUtilisateursAsync()
         {
             var query = "SELECT * FROM c";
             var queryDefinition = new QueryDefinition(query);
-            var queryResultSetIterator = _container.GetItemQueryIterator<User>(queryDefinition);
+            var queryResultSetIterator = _container.GetItemQueryIterator<UserApp>(queryDefinition);
 
-            var users = new List<User>();
+            var users = new List<UserApp>();
             while (queryResultSetIterator.HasMoreResults)
             {
                 var currentResultSet = await queryResultSetIterator.ReadNextAsync();
@@ -43,8 +59,15 @@ namespace link_up.Services
         {
             try
             {
+                // Générer un ID si non fourni
+                if (string.IsNullOrWhiteSpace(user.Id))
+                {
+                    user.Id = Guid.NewGuid().ToString();
+                }
                 user.CreatedAt = DateTime.UtcNow;
-                var response = await _container.CreateItemAsync(user, new PartitionKey(user.Id));
+                Console.WriteLine(user);
+                var response = await _container.CreateItemAsync<UserApp>(user, new PartitionKey("user_id"));
+
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
