@@ -16,7 +16,7 @@ namespace link_up.Models
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Id: {id}");
-            sb.AppendLine($"userid: {user_id}");
+            // sb.AppendLine($"userid: {user_id}");
             sb.AppendLine($"Email: {Email}");
             sb.AppendLine($"Password: {Password}");
             sb.AppendLine($"Name: {Name}");

@@ -10,6 +10,8 @@ namespace link_up.Services
         private readonly CosmosClient _cosmosClient;
         private readonly Database _database;
         private readonly Container _container;
+        private string _userPartitionKey;
+
 
         public UserCosmosService(IConfiguration configuration)
         {
@@ -19,14 +21,15 @@ namespace link_up.Services
             string endpointUri = cosmosSettings["EndpointUri"];
             string primaryKey = cosmosSettings["PrimaryKey"];
             string databaseId = cosmosSettings["DatabaseId"];
-            string containerId = cosmosSettings["ContainerId"];
+            string containerId = cosmosSettings["ContainerUserId"];
+            _userPartitionKey = cosmosSettings["UserPartitionKey"];
 
             _cosmosClient = new CosmosClient(endpointUri, primaryKey, new CosmosClientOptions { ApplicationName = "LinkUpApp" });
             _database = _cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId).Result;
             ContainerProperties containerProperties = new ContainerProperties()
             {
                 Id = containerId,
-                PartitionKeyPath = "/user_id",
+                PartitionKeyPath = _userPartitionKey,
             };
             _container = _database.CreateContainerIfNotExistsAsync(containerProperties).Result;
         }
@@ -107,7 +110,7 @@ namespace link_up.Services
                 // Assurez-vous que la clé de partition est définie
                 if (string.IsNullOrWhiteSpace(user.user_id))
                 {
-                    user.user_id = "/user_id";
+                    user.user_id = this._userPartitionKey;
                 }
 
                 if (!this.IsValidEmail(user.Email))
@@ -127,12 +130,12 @@ namespace link_up.Services
             }
         }
 
-        public async Task<UserApp?> GetUserByIdAsync(string userId, string partitionKey)
+        public async Task<UserApp?> GetUserByIdAsync(string userId)
         {
             try
             {
                 // Lit l'élément de la base Cosmos DB
-                var response = await _container.ReadItemAsync<UserApp>(userId, new PartitionKey(partitionKey));
+                var response = await _container.ReadItemAsync<UserApp>(userId, new PartitionKey(this._userPartitionKey));
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -149,12 +152,12 @@ namespace link_up.Services
         }
 
 
-        public async Task<UserApp> UpdateUserAsync(string userId, UserApp updatedUser, string partitionKey)
+        public async Task<UserApp> UpdateUserAsync(string userId, UserApp updatedUser)
         {
             try
             {
                 // Appelle la méthode pour récupérer l'utilisateur existant
-                var user = await GetUserByIdAsync(userId, partitionKey);
+                var user = await GetUserByIdAsync(userId);
                 if (user == null) throw new Exception($"User with ID {userId} not found.");
 
                 // Met à jour les propriétés de l'utilisateur
@@ -163,7 +166,7 @@ namespace link_up.Services
                 user.IsPrivate = updatedUser.IsPrivate;
 
                 // Remplace l'élément dans la base de données
-                var response = await _container.ReplaceItemAsync(user, user.id.ToString(), new PartitionKey(partitionKey));
+                var response = await _container.ReplaceItemAsync(user, user.id.ToString(), new PartitionKey(this._userPartitionKey));
                 return response.Resource;
             }
             catch (CosmosException ex)
@@ -175,11 +178,11 @@ namespace link_up.Services
         }
 
 
-        public async Task DeleteUserAsync(string userId, string partitionKey)
+        public async Task DeleteUserAsync(string userId)
         {
             try
             {
-                await _container.DeleteItemAsync<UserApp>(userId.ToString(), new PartitionKey(partitionKey));
+                await _container.DeleteItemAsync<UserApp>(userId.ToString(), new PartitionKey(this._userPartitionKey));
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {

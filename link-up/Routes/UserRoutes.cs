@@ -26,11 +26,11 @@ namespace link_up.Routes
             .WithOpenApi();
 
             // Route GET pour récupérer un utilisateur par ID
-            app.MapGet("/utilisateurs/{id}", async (string id, string partitionKey, UserCosmosService userCosmosService) =>
+            app.MapGet("/utilisateurs/{id}", async (string id, UserCosmosService userCosmosService) =>
             {
                 try
                 {
-                    var user = await userCosmosService.GetUserByIdAsync(id, partitionKey);
+                    var user = await userCosmosService.GetUserByIdAsync(id);
 
                     if (user == null)
                     {
@@ -48,11 +48,11 @@ namespace link_up.Routes
             .WithOpenApi();
 
             // Route DELETE pour supprimer un utilisateur
-            app.MapDelete("/utilisateurs/{id}", async (string id, string partitionKey, UserCosmosService userCosmosService) =>
+            app.MapDelete("/utilisateurs/{id}", async (string id, UserCosmosService userCosmosService) =>
             {
                 try
                 {
-                    await userCosmosService.DeleteUserAsync(id, partitionKey);
+                    await userCosmosService.DeleteUserAsync(id);
                     return Results.NoContent();
                 }
                 catch (Exception ex)
@@ -64,11 +64,11 @@ namespace link_up.Routes
             .WithOpenApi();
 
             // Route PUT pour mettre à jour un utilisateur
-            app.MapPut("/utilisateurs/{id}", async (string id, LinkUpUser updatedUser, string partitionKey, UserCosmosService userCosmosService) =>
+            app.MapPut("/utilisateurs/{id}", async (string id, LinkUpUser updatedUser, UserCosmosService userCosmosService) =>
             {
                 try
                 {
-                    var updatedUserData = await userCosmosService.UpdateUserAsync(id, updatedUser, partitionKey);
+                    var updatedUserData = await userCosmosService.UpdateUserAsync(id, updatedUser);
                     return Results.Ok(updatedUserData);
                 }
                 catch (Exception ex)
