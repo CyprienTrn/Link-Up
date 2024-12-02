@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("link-up")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+08e0653d6f3b7532984fbe5282973a8d0a7fc009")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a32b521465e3b0880df71b781dec8839c5988cac")]
 [assembly: System.Reflection.AssemblyProductAttribute("link-up")]
 [assembly: System.Reflection.AssemblyTitleAttribute("link-up")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
