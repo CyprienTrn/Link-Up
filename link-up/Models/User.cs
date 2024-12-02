@@ -1,15 +1,11 @@
-using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 using System.Text;
 
 namespace link_up.Models
 {
     public class User
     {
-        // [JsonPropertyName("id")] // Mappe "Id" au format attendu "id"
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        // [JsonProperty(PropertyName = "partitionKey")]
-        // public string PartitionKey { get; set; }
+        public string id { get; set; } = Guid.NewGuid().ToString();
+        public string user_id { get; set; }
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
@@ -19,7 +15,8 @@ namespace link_up.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"Id: {Id}");
+            sb.AppendLine($"Id: {id}");
+            sb.AppendLine($"userid: {user_id}");
             sb.AppendLine($"Email: {Email}");
             sb.AppendLine($"Password: {Password}");
             sb.AppendLine($"Name: {Name}");

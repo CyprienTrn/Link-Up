@@ -33,7 +33,7 @@ app.MapGet("/utilisateurs", async (CosmosService cosmosService) =>
 app.MapPost("/utilisateurs", async (LinkUpUser user, CosmosService cosmosService) =>
 {
     var createdUser = await cosmosService.CreateUserAsync(user);
-    return Results.Created($"/utilisateurs/{createdUser.Id}", createdUser);
+    return Results.Created($"/utilisateurs/{createdUser.id}", createdUser);
 })
 .WithName("CreateUtilisateur")
 .WithOpenApi();

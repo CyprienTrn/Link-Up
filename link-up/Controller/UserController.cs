@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using LinkUpUser = link_up.Models.User;
 using link_up.Services;
-using System.Threading.Tasks;
 
 namespace link_up.Controllers
 {
@@ -23,7 +22,7 @@ namespace link_up.Controllers
             try
             {
                 var createdUser = await _cosmosService.CreateUserAsync(user);
-                return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+                return CreatedAtAction(nameof(GetUserById), new { id = createdUser.id }, createdUser);
             }
             catch (Exception ex)
             {
