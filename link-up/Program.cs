@@ -1,10 +1,10 @@
 using link_up.Services;
-using LinkUpUser = link_up.Models.User;
+using link_up.Routes;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddSingleton<CosmosService>();
+builder.Services.AddSingleton<UserCosmosService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -22,20 +22,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/utilisateurs", async (CosmosService cosmosService) =>
-{
-    var utilisateurs = await cosmosService.GetAllUtilisateursAsync();
-    return utilisateurs;
-})
-.WithName("GetAllUtilisateurs")
-.WithOpenApi();
-
-app.MapPost("/utilisateurs", async (LinkUpUser user, CosmosService cosmosService) =>
-{
-    var createdUser = await cosmosService.CreateUserAsync(user);
-    return Results.Created($"/utilisateurs/{createdUser.id}", createdUser);
-})
-.WithName("CreateUtilisateur")
-.WithOpenApi();
+// on ajoute toutes les routes de l'api de l'utilisateur
+app.MapUserRoutes();
 
 app.Run();
