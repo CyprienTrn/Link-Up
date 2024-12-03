@@ -8,25 +8,25 @@ namespace link_up.Routes
         public static void MapUserRoutes(this IEndpointRouteBuilder app)
         {
             // Route POST pour créer un utilisateur
-            app.MapPost("/utilisateurs", async (LinkUpUser user, UserCosmosService userCosmosService) =>
+            app.MapPost("/", async (LinkUpUser user, UserCosmosService userCosmosService) =>
             {
                 var createdUser = await userCosmosService.CreateUserAsync(user);
-                return Results.Created($"/utilisateurs/{createdUser.id}", createdUser);
+                return Results.Created($"/{createdUser.id}", createdUser);
             })
-            .WithName("CreateUtilisateur")
+            .WithName("CreateUser")
             .WithOpenApi();
 
             // Route GET pour récupérer tous les utilisateurs
-            app.MapGet("/utilisateurs", async (UserCosmosService userCosmosService) =>
+            app.MapGet("/", async (UserCosmosService userCosmosService) =>
             {
                 var utilisateurs = await userCosmosService.GetAllUtilisateursAsync();
                 return utilisateurs;
             })
-            .WithName("GetAllUtilisateurs")
+            .WithName("GetAllUsers")
             .WithOpenApi();
 
             // Route GET pour récupérer un utilisateur par ID
-            app.MapGet("/utilisateurs/{id}", async (string id, UserCosmosService userCosmosService) =>
+            app.MapGet("/{id}", async (string id, UserCosmosService userCosmosService) =>
             {
                 try
                 {
@@ -44,11 +44,11 @@ namespace link_up.Routes
                     return Results.Problem(ex.Message);
                 }
             })
-            .WithName("GetUtilisateur")
+            .WithName("GetUser")
             .WithOpenApi();
 
             // Route DELETE pour supprimer un utilisateur
-            app.MapDelete("/utilisateurs/{id}", async (string id, UserCosmosService userCosmosService) =>
+            app.MapDelete("/{id}", async (string id, UserCosmosService userCosmosService) =>
             {
                 try
                 {
@@ -60,11 +60,11 @@ namespace link_up.Routes
                     return Results.Problem(ex.Message);
                 }
             })
-            .WithName("DeleteUtilisateur")
+            .WithName("DeleteUser")
             .WithOpenApi();
 
             // Route PUT pour mettre à jour un utilisateur
-            app.MapPut("/utilisateurs/{id}", async (string id, LinkUpUser updatedUser, UserCosmosService userCosmosService) =>
+            app.MapPut("/{id}", async (string id, LinkUpUser updatedUser, UserCosmosService userCosmosService) =>
             {
                 try
                 {
@@ -80,7 +80,7 @@ namespace link_up.Routes
                     return Results.Problem(ex.Message);
                 }
             })
-            .WithName("UpdateUtilisateur")
+            .WithName("UpdateUser")
             .WithOpenApi();
         }
     }

@@ -101,17 +101,11 @@ namespace link_up.Services
         {
             try
             {
-                // Générer un ID si non fourni
-                if (string.IsNullOrWhiteSpace(user.id))
-                {
-                    user.id = Guid.NewGuid().ToString();
-                }
+                // on génère un id unique à chaque utilisateur
+                user.id = Guid.NewGuid().ToString();
 
-                // Assurez-vous que la clé de partition est définie
-                if (string.IsNullOrWhiteSpace(user.user_id))
-                {
-                    user.user_id = this._userPartitionKey;
-                }
+                // on génère la clef de partition
+                user.user_id = this._userPartitionKey;
 
                 if (!this.IsValidEmail(user.Email))
                 {
@@ -187,6 +181,22 @@ namespace link_up.Services
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 throw new Exception($"User with ID {userId} not found.", ex);
+            }
+        }
+
+        // Méthode pour vérifier l'existence de l'utilisateur
+
+        public async Task<bool> CheckUserExistsAsync(string userId)
+        {
+            try
+            {
+                // Exemple de recherche de l'utilisateur dans la base Cosmos DB
+                var response = await _container.ReadItemAsync<UserApp>(userId, new PartitionKey("/user_id"));
+                return response.Resource != null;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
             }
         }
     }

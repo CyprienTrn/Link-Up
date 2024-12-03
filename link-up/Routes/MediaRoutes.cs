@@ -5,24 +5,63 @@ namespace link_up.Routes
 {
     public static class MediasRoutes
     {
-        public static void MapMediasRoutes(this IEndpointRouteBuilder app)
+        public static void MapMediaRoutes(this IEndpointRouteBuilder app)
         {
-            // Route POST pour créer un utilisateur
-            app.MapPost("/medias", async (Media media, MediaCosmosService mediaCosmosService) =>
+            // Route POST pour créer un média
+            app.MapPost("/", async (Media media, MediaCosmosService mediaCosmosService) =>
             {
                 var createdMedia = await mediaCosmosService.CreateMediaAsync(media);
-                return Results.Created($"/medias/{createdMedia.id}", createdMedia);
+                return Results.Created($"/{createdMedia.id}", createdMedia);
             })
             .WithName("CreateMedia")
             .WithOpenApi();
 
             // Route GET pour récupérer tous les médias
-            app.MapGet("/medias", async (MediaCosmosService mediaCosmosService) =>
+            app.MapGet("/", async (MediaCosmosService mediaCosmosService) =>
             {
                 var medias = await mediaCosmosService.GetAllMediasAsync();
                 return medias;
             })
             .WithName("GetAllMedias")
+            .WithOpenApi();
+
+
+            // Route GET pour récupérer un médias par son ID
+            app.MapGet("/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
+            {
+                try
+                {
+                    var content = await mediaCosmosService.GetMediaByIdAsync(id);
+
+                    if (content == null)
+                    {
+                        return Results.NotFound(new { message = $"Media with ID {id} not found." });
+                    }
+
+                    return Results.Ok(content);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(ex.Message);
+                }
+            })
+            .WithName("GetMedia")
+            .WithOpenApi();
+
+            // Route DELETE pour supprimer un Contenu
+            app.MapDelete("/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
+            {
+                try
+                {
+                    await mediaCosmosService.DeleteMediaAsync(id);
+                    return Results.NoContent();
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(ex.Message);
+                }
+            })
+            .WithName("DeleteMedia")
             .WithOpenApi();
         }
     }

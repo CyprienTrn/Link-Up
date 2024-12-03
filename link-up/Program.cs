@@ -1,15 +1,22 @@
 using link_up.Services;
 using link_up.Routes;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSingleton<UserCosmosService>();
 builder.Services.AddSingleton<MediaCosmosService>();
+builder.Services.AddSingleton<ContentCosmosService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.CustomSchemaIds(type => type.FullName);
+    // Configure Swagger pour associer des tags aux groupes
+    c.TagActionsBy(api => new[] { api.GroupName });
 });
 
 var app = builder.Build();
@@ -18,15 +25,24 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.DefaultModelsExpandDepth(-1);  // Pour ne pas afficher les modèles
+    });
 }
 
 app.UseHttpsRedirection();
 
-// on ajoute toutes les routes de l'api de l'utilisateur
-app.MapUserRoutes();
+app.MapGroup("/utilisateurs")
+   .WithTags("Utilisateurs")
+   .MapUserRoutes();
 
-// on ajoute toutes les routes de l'api du média
-app.MapMediasRoutes();
+app.MapGroup("/contenus")
+   .WithTags("Contenus")
+   .MapContentRoutes();
+
+app.MapGroup("/medias")
+   .WithTags("Médias")
+   .MapMediaRoutes();
 
 app.Run();

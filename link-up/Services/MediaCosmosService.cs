@@ -28,7 +28,7 @@ namespace link_up.Services
             ContainerProperties containerProperties = new ContainerProperties()
             {
                 Id = containerId,
-                PartitionKeyPath = "/media",
+                PartitionKeyPath = "/media_id",
             };
             _container = _database.CreateContainerIfNotExistsAsync(containerProperties).Result;
         }
@@ -56,7 +56,7 @@ namespace link_up.Services
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
             {
-                throw new Exception($"User with ID {media.id} already exists.", ex);
+                throw new Exception($"Media with ID {media.id} already exists.", ex);
             }
         }
 
@@ -73,6 +73,39 @@ namespace link_up.Services
                 users.AddRange(currentResultSet);
             }
             return users;
+        }
+
+        public async Task<Media?> GetMediaByIdAsync(string mediaId)
+        {
+            try
+            {
+                // Lit l'élément de la base Cosmos DB
+                var response = await _container.ReadItemAsync<Media>(mediaId, new PartitionKey(this._mediaPartitionKey));
+                return response.Resource;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Retourne null si le média n'est pas trouvé
+                return null;
+            }
+            catch (CosmosException ex)
+            {
+                // Log et relance toute autre exception Cosmos
+                Console.WriteLine($"An error occurred while retrieving the media: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task DeleteMediaAsync(string mediaId)
+        {
+            try
+            {
+                await _container.DeleteItemAsync<Media>(mediaId.ToString(), new PartitionKey(this._mediaPartitionKey));
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                throw new Exception($"User with ID {mediaId} not found.", ex);
+            }
         }
 
     }

@@ -1,11 +1,9 @@
-using System.Text.Json.Serialization;
-
 namespace link_up.Models
 {
     public class Content
     {
-        [JsonPropertyName("id")] // Mappe "Id" au format attendu "id"
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string id { get; set; } = Guid.NewGuid().ToString();
+        public string content_id { get; set; }
         public string UserId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
