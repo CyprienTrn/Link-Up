@@ -7,15 +7,6 @@ namespace link_up.Routes
     {
         public static void MapMediaRoutes(this IEndpointRouteBuilder app)
         {
-            // Route POST pour créer un média
-            app.MapPost("/", async (Media media, MediaCosmosService mediaCosmosService) =>
-            {
-                var createdMedia = await mediaCosmosService.CreateMediaAsync(media);
-                return Results.Created($"/{createdMedia.id}", createdMedia);
-            })
-            .WithName("CreateMedia")
-            .WithOpenApi();
-
             // Route GET pour récupérer tous les médias
             app.MapGet("/", async (MediaCosmosService mediaCosmosService) =>
             {

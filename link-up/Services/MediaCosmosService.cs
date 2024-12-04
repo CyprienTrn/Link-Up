@@ -33,21 +33,18 @@ namespace link_up.Services
             _container = _database.CreateContainerIfNotExistsAsync(containerProperties).Result;
         }
 
-        public async Task<Media> CreateMediaAsync(Media media)
+        public async Task<Media> CreateMediaAsync(Media media, string contentId)
         {
             try
             {
-                // Générer un ID si non fourni
-                if (string.IsNullOrWhiteSpace(media.id))
-                {
-                    media.id = Guid.NewGuid().ToString();
-                }
+                // on génère un ID unique
+                media.id = Guid.NewGuid().ToString();
 
-                // Assurez-vous que la clé de partition est définie
-                if (string.IsNullOrWhiteSpace(media.media_id))
-                {
-                    media.media_id = this._mediaPartitionKey;
-                }
+                // on définit la clef de partition
+                media.media_id = this._mediaPartitionKey;
+
+                // on définit l'ID du content
+                media.ContentId = contentId;
 
                 media.UploadedAt = DateTime.UtcNow;
                 var response = await _container.CreateItemAsync(media, new PartitionKey(media.media_id));

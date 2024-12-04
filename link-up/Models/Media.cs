@@ -1,14 +1,21 @@
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace link_up.Models
 {
     public class Media
     {
+
+        [JsonIgnore]
         public string id { get; set; } = Guid.NewGuid().ToString();
+        [JsonIgnore]
         public string media_id { get; set; } = string.Empty;
+        [JsonIgnore]
         public string ContentId { get; set; } = string.Empty;
         public string MediaUrl { get; set; } = string.Empty;
         public string MediaType { get; set; } = string.Empty;
+
+        [JsonIgnore]
         public DateTime UploadedAt { get; set; }
         public override string ToString()
         {

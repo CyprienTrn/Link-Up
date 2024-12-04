@@ -1,7 +1,7 @@
 using Microsoft.Azure.Cosmos;
 using System.Net;
 using link_up.Models;
-using UserService = link_up.Services.UserCosmosService;
+using link_up.Services;
 
 namespace link_up.Services
 {
@@ -9,16 +9,18 @@ namespace link_up.Services
     {
         private readonly CosmosClient _cosmosClient;
         private readonly UserCosmosService _userService;
+        private readonly MediaCosmosService _mediaService;
         private readonly Database _database;
         private readonly Container _container;
         private string _contentPartitionKey;
 
 
-        public ContentCosmosService(IConfiguration configuration, UserService userService)
+        public ContentCosmosService(IConfiguration configuration, UserCosmosService userService, MediaCosmosService mediaService)
         {
             // on charge la configuration depuis le appsettings.json
             // var cosmosSettings = configuration.GetSection("CosmosDb");
             _userService = userService;
+            _mediaService = mediaService;
             var cosmosSettings = configuration.GetSection("CosmosDbCyp");
             string endpointUri = cosmosSettings["EndpointUri"];
             string primaryKey = cosmosSettings["PrimaryKey"];
@@ -63,7 +65,16 @@ namespace link_up.Services
                     throw new Exception("Le champ 'Title' ne doit pas être vide, il est requis.");
                 }
 
-                // Création du contenu
+                // Vérification des médias
+                if (content.medias != null && content.medias.Count > 0)
+                {
+                    foreach (var media in content.medias)
+                    {
+                        this._mediaService.CreateMediaAsync(media, content.id);
+                    }
+                }
+
+                // Création du contenu après la gestion des médias
                 var response = await _container.CreateItemAsync(content, new PartitionKey(content.content_id));
 
                 return response.Resource;
@@ -73,6 +84,7 @@ namespace link_up.Services
                 throw new Exception($"Le contenu avec l'ID '{content.id}' existe déjà.", ex);
             }
         }
+
 
         public async Task<IEnumerable<Content>> GetAllContentsAsync()
         {
@@ -137,20 +149,46 @@ namespace link_up.Services
             }
         }
 
-
         public async Task DeleteContentAsync(string contentId)
         {
             try
             {
-                await _container.DeleteItemAsync<Content>(contentId.ToString(), new PartitionKey(this._contentPartitionKey));
+                // Récupérer le contenu à supprimer pour identifier les médias associés
+                var query = new QueryDefinition("SELECT * FROM c WHERE c.id = @contentId")
+                    .WithParameter("@contentId", contentId);
 
-                // SUPPRIMER LES MEDIAS ASSOCIES !!!!
+                var iterator = _container.GetItemQueryIterator<Content>(query);
+                Content contentToDelete = null;
+
+                if (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    contentToDelete = response.FirstOrDefault();
+                }
+
+                if (contentToDelete == null)
+                {
+                    throw new Exception($"Le contenu avec l'ID '{contentId}' n'existe pas.");
+                }
+
+                // Supprimer les médias associés
+                if (contentToDelete.medias != null && contentToDelete.medias.Count > 0)
+                {
+                    foreach (var media in contentToDelete.medias)
+                    {
+                        await _mediaService.DeleteMediaAsync(media.id);
+                    }
+                }
+
+                // Supprimer le contenu principal
+                await _container.DeleteItemAsync<Content>(contentId, new PartitionKey(this._contentPartitionKey));
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                throw new Exception($"User with ID {contentId} not found.", ex);
+                throw new Exception($"Le contenu avec l'ID '{contentId}' n'existe pas.", ex);
             }
         }
+
 
     }
 }
