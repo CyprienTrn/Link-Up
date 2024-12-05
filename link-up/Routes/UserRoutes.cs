@@ -7,26 +7,56 @@ namespace link_up.Routes
     {
         public static void MapUserRoutes(this IEndpointRouteBuilder app)
         {
-            // Route POST pour créer un utilisateur
-            app.MapPost("/", async (LinkUpUser user, UserCosmosService userCosmosService) =>
+            // Créer un nouvel utilisateur (POST /api/users)
+            app.MapPost("/api/users", async (LinkUpUser user, UserCosmosService userCosmosService) =>
             {
-                var createdUser = await userCosmosService.CreateUserAsync(user);
-                return Results.Created($"/{createdUser.id}", createdUser);
+                try
+                {
+                    var createdUser = await userCosmosService.CreateUserAsync(user);
+                    return Results.Created($"/api/users/{createdUser.id}", createdUser);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(ex.Message);
+                }
             })
             .WithName("CreateUser")
-            .WithOpenApi();
-
-            // Route GET pour récupérer tous les utilisateurs
-            app.MapGet("/", async (UserCosmosService userCosmosService) =>
+            .WithOpenApi(operation =>
             {
-                var utilisateurs = await userCosmosService.GetAllUtilisateursAsync();
-                return utilisateurs;
+                operation.Summary = "Créer un nouvel utilisateur.";
+                operation.Description = "Cet endpoint permet de créer un nouvel utilisateur dans le système.";
+                return operation;
+            })
+            .Accepts<LinkUpUser>("application/json")
+            .Produces<LinkUpUser>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+            // Récupérer tous les utilisateurs (GET /api/users)
+            app.MapGet("/api/users", async (UserCosmosService userCosmosService) =>
+            {
+                try
+                {
+                    var users = await userCosmosService.GetAllUtilisateursAsync();
+                    return Results.Ok(users);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(ex.Message);
+                }
             })
             .WithName("GetAllUsers")
-            .WithOpenApi();
+            .WithOpenApi(operation =>
+            {
+                operation.Summary = "Récupérer tous les utilisateurs.";
+                operation.Description = "Cet endpoint permet de récupérer tous les utilisateurs présents dans le système.";
+                return operation;
+            })
+            .Produces<IEnumerable<LinkUpUser>>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
 
-            // Route GET pour récupérer un utilisateur par ID
-            app.MapGet("/{id}", async (string id, UserCosmosService userCosmosService) =>
+            // Récupérer un utilisateur par ID (GET /api/users/{id})
+            app.MapGet("/api/users/{id}", async (string id, UserCosmosService userCosmosService) =>
             {
                 try
                 {
@@ -34,7 +64,7 @@ namespace link_up.Routes
 
                     if (user == null)
                     {
-                        return Results.NotFound(new { message = $"User with ID {id} not found." });
+                        return Results.NotFound(new { message = $"Utilisateur avec l'ID {id} introuvable." });
                     }
 
                     return Results.Ok(user);
@@ -44,11 +74,19 @@ namespace link_up.Routes
                     return Results.Problem(ex.Message);
                 }
             })
-            .WithName("GetUser")
-            .WithOpenApi();
+            .WithName("GetUserById")
+            .WithOpenApi(operation =>
+            {
+                operation.Summary = "Récupérer un utilisateur par ID.";
+                operation.Description = "Cet endpoint permet de récupérer un utilisateur spécifique grâce à son ID.";
+                return operation;
+            })
+            .Produces<LinkUpUser>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
 
-            // Route DELETE pour supprimer un utilisateur
-            app.MapDelete("/{id}", async (string id, UserCosmosService userCosmosService) =>
+            // Supprimer un utilisateur par ID (DELETE /api/users/{id})
+            app.MapDelete("/api/users/{id}", async (string id, UserCosmosService userCosmosService) =>
             {
                 try
                 {
@@ -61,10 +99,18 @@ namespace link_up.Routes
                 }
             })
             .WithName("DeleteUser")
-            .WithOpenApi();
+            .WithOpenApi(operation =>
+            {
+                operation.Summary = "Supprimer un utilisateur par ID.";
+                operation.Description = "Cet endpoint permet de supprimer un utilisateur spécifique grâce à son ID.";
+                return operation;
+            })
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
 
-            // Route PUT pour mettre à jour un utilisateur
-            app.MapPut("/{id}", async (string id, LinkUpUser updatedUser, UserCosmosService userCosmosService) =>
+            // Mettre à jour un utilisateur (PUT /api/users/{id})
+            app.MapPut("/api/users/{id}", async (string id, LinkUpUser updatedUser, UserCosmosService userCosmosService) =>
             {
                 try
                 {
@@ -81,7 +127,16 @@ namespace link_up.Routes
                 }
             })
             .WithName("UpdateUser")
-            .WithOpenApi();
+            .WithOpenApi(operation =>
+            {
+                operation.Summary = "Mettre à jour un utilisateur par ID.";
+                operation.Description = "Cet endpoint permet de mettre à jour un utilisateur existant grâce à son ID.";
+                return operation;
+            })
+            .Accepts<LinkUpUser>("application/json")
+            .Produces<LinkUpUser>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
         }
     }
 }

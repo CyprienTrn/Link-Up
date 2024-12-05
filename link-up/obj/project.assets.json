@@ -9743,11 +9743,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\toura\\OneDrive\\Documents\\Travail\\Supinfo\\Developping Azure\\Link-Up\\link-up\\link-up.csproj",
+      "projectUniqueName": "C:\\Users\\toura\\OneDrive\\Documents\\Travail\\Supinfo\\Developping Azure\\link-up\\link-up\\link-up.csproj",
       "projectName": "link-up",
-      "projectPath": "C:\\Users\\toura\\OneDrive\\Documents\\Travail\\Supinfo\\Developping Azure\\Link-Up\\link-up\\link-up.csproj",
+      "projectPath": "C:\\Users\\toura\\OneDrive\\Documents\\Travail\\Supinfo\\Developping Azure\\link-up\\link-up\\link-up.csproj",
       "packagesPath": "C:\\Users\\toura\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\toura\\OneDrive\\Documents\\Travail\\Supinfo\\Developping Azure\\Link-Up\\link-up\\obj\\",
+      "outputPath": "C:\\Users\\toura\\OneDrive\\Documents\\Travail\\Supinfo\\Developping Azure\\link-up\\link-up\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -1,65 +1,5 @@
-// using link_up.Models;
-// using link_up.Services;
-
-// namespace link_up.Routes
-// {
-//     public static class MediasRoutes
-//     {
-//         public static void MapMediaRoutes(this IEndpointRouteBuilder app)
-//         {
-//             // Route GET pour récupérer tous les médias
-//             app.MapGet("/", async (MediaCosmosService mediaCosmosService) =>
-//             {
-//                 var medias = await mediaCosmosService.GetAllMediasAsync();
-//                 return medias;
-//             })
-//             .WithName("GetAllMedias")
-//             .WithOpenApi();
-
-
-//             // Route GET pour récupérer un médias par son ID
-//             app.MapGet("/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
-//             {
-//                 try
-//                 {
-//                     var content = await mediaCosmosService.GetMediaByIdAsync(id);
-
-//                     if (content == null)
-//                     {
-//                         return Results.NotFound(new { message = $"Media with ID {id} not found." });
-//                     }
-
-//                     return Results.Ok(content);
-//                 }
-//                 catch (Exception ex)
-//                 {
-//                     return Results.Problem(ex.Message);
-//                 }
-//             })
-//             .WithName("GetMedia")
-//             .WithOpenApi();
-
-//             // Route DELETE pour supprimer un Contenu
-//             app.MapDelete("/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
-//             {
-//                 try
-//                 {
-//                     await mediaCosmosService.DeleteMediaAsync(id);
-//                     return Results.NoContent();
-//                 }
-//                 catch (Exception ex)
-//                 {
-//                     return Results.Problem(ex.Message);
-//                 }
-//             })
-//             .WithName("DeleteMedia")
-//             .WithOpenApi();
-//         }
-//     }
-// }
-
-using link_up.Models;
 using link_up.Services;
+using link_up.Models;
 
 namespace link_up.Routes
 {
@@ -67,39 +7,52 @@ namespace link_up.Routes
     {
         public static void MapMediaRoutes(this IEndpointRouteBuilder app)
         {
-            // Route GET pour récupérer tous les médias
-            app.MapGet("/", async (MediaCosmosService mediaCosmosService) =>
+            // Récupérer tous les médias (GET /api/medias)
+            app.MapGet("/api/medias", async (MediaCosmosService mediaCosmosService) =>
             {
                 var medias = await mediaCosmosService.GetAllMediasAsync();
-                return medias;
+                return Results.Ok(medias);
             })
             .WithName("GetAllMedias")
-            .WithOpenApi();
+            .WithOpenApi(operation =>
+            {
+                operation.Summary = "Récupérer tous les médias.";
+                operation.Description = "Cet endpoint permet de récupérer tous les médias disponibles dans le système.";
+                return operation;
+            })
+            .Produces<IEnumerable<Media>>(StatusCodes.Status200OK);
 
-            // Route GET pour récupérer un média par son ID
-            app.MapGet("/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
+            // Récupérer un média par ID (GET /api/medias/{id})
+            app.MapGet("/api/medias/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
             {
                 try
                 {
-                    var content = await mediaCosmosService.GetMediaByIdAsync(id);
+                    var media = await mediaCosmosService.GetMediaByIdAsync(id);
 
-                    if (content == null)
+                    if (media == null)
                     {
-                        return Results.NotFound(new { message = $"Media with ID {id} not found." });
+                        return Results.NotFound(new { message = $"Média avec l'ID {id} introuvable." });
                     }
 
-                    return Results.Ok(content);
+                    return Results.Ok(media);
                 }
                 catch (Exception ex)
                 {
                     return Results.Problem(ex.Message);
                 }
             })
-            .WithName("GetMedia")
-            .WithOpenApi();
+            .WithName("GetMediaById")
+            .WithOpenApi(operation =>
+            {
+                operation.Summary = "Récupérer un média par ID.";
+                operation.Description = "Cet endpoint permet de récupérer un média spécifique à partir de son ID.";
+                return operation;
+            })
+            .Produces<Media>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
-            // Route DELETE pour supprimer un média
-            app.MapDelete("/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
+            // Supprimer un média par ID (DELETE /api/medias/{id})
+            app.MapDelete("/api/medias/{id}", async (string id, MediaCosmosService mediaCosmosService) =>
             {
                 try
                 {
@@ -112,7 +65,14 @@ namespace link_up.Routes
                 }
             })
             .WithName("DeleteMedia")
-            .WithOpenApi();
+            .WithOpenApi(operation =>
+            {
+                operation.Summary = "Supprimer un média par ID.";
+                operation.Description = "Cet endpoint permet de supprimer un média spécifique en utilisant son ID.";
+                return operation;
+            })
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound);
         }
     }
 }

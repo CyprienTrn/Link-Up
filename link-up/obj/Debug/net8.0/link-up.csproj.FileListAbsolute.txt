@@ -113,3 +113,16 @@ C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\link
 C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\link-up\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
 C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\link-up\obj\Debug\net8.0\link-up.RazorAssemblyInfo.cache
 C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\link-up\obj\Debug\net8.0\link-up.RazorAssemblyInfo.cs
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.csproj.AssemblyReference.cache
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.AssemblyInfoInputs.cache
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.AssemblyInfo.cs
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.csproj.CoreCompileInputs.cache
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.RazorAssemblyInfo.cache
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.RazorAssemblyInfo.cs
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.sourcelink.json
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.dll
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\refint\link-up.dll
+C:\Users\toura\OneDrive\Documents\Travail\Supinfo\Developping Azure\Link-Up\obj\Debug\net8.0\link-up.pdb
