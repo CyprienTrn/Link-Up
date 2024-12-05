@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - linkupsupinfo
 
 on:
@@ -14,19 +11,28 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # Étape 1 : Cloner le dépôt
       - uses: actions/checkout@v4
 
+      # Étape 2 : Configurer .NET Core
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
+      # Étape 3 : Se déplacer dans le dossier `link-up` et construire le projet
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: |
+          cd link-up
+          dotnet build --configuration Release
 
+      # Étape 4 : Publier le projet dans un dossier de sortie
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: |
+          cd link-up
+          dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
+      # Étape 5 : Télécharger les fichiers publiés comme artefacts
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -40,14 +46,16 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write
 
     steps:
+      # Étape 1 : Télécharger les artefacts depuis l'étape de build
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
+      # Étape 2 : Se connecter à Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,6 +63,7 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8BA663745748400A93B6867CD4D7DA34 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_664F867E0FA147178E8EDF17DAD2DB87 }}
 
+      # Étape 3 : Déployer vers Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -62,4 +71,3 @@ jobs:
           app-name: 'linkupsupinfo'
           slot-name: 'Production'
           package: .
-          
