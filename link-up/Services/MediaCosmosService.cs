@@ -6,9 +6,9 @@ namespace link_up.Services
 {
     public class MediaCosmosService
     {
-        private readonly CosmosClient _cosmosClient;
+        public CosmosClient _cosmosClient;
         private readonly Database _database;
-        private readonly Container _container;
+        public Container _container;
         private string _mediaPartitionKey;
 
 
