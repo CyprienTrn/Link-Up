@@ -1,9 +1,5 @@
 using link_up.Services;
 using link_up.Routes;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 
 public class Program
 {
@@ -17,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<UserCosmosService>();
 builder.Services.AddSingleton<MediaCosmosService>();
 builder.Services.AddSingleton<ContentCosmosService>();
+builder.Services.AddSingleton<BlobService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -53,4 +50,6 @@ app.MapGroup("/medias")
 
 app.Run();
 
-    }}
+  }
+}
+

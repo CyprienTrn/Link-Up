@@ -1,18 +1,20 @@
 using Microsoft.Azure.Cosmos;
 using System.Net;
 using link_up.Models;
+using link_up.Services;
 
 namespace link_up.Services
 {
     public class MediaCosmosService
     {
         public CosmosClient _cosmosClient;
+        private readonly BlobService _blobService;
         private readonly Database _database;
         public Container _container;
         private string _mediaPartitionKey;
 
 
-        public MediaCosmosService(IConfiguration configuration)
+        public MediaCosmosService(IConfiguration configuration, BlobService blobService)
         {
             // on charge la configuration depuis le appsettings.json
             // var cosmosSettings = configuration.GetSection("CosmosDb");
@@ -31,6 +33,9 @@ namespace link_up.Services
                 PartitionKeyPath = "/media_id",
             };
             _container = _database.CreateContainerIfNotExistsAsync(containerProperties).Result;
+
+            // on set le service du blob storage
+            _blobService = blobService;
         }
 
         public async Task<Media> CreateMediaAsync(Media media, string contentId)
@@ -47,6 +52,13 @@ namespace link_up.Services
                 media.ContentId = contentId;
 
                 media.UploadedAt = DateTime.UtcNow;
+
+                // on ajoute le fichier dans le blob
+                string mediaUrl = await this._blobService.UploadFileAsync(media.PathToFile);
+
+                // on ajoute le lien vers le média uploadé
+                media.MediaUrl = mediaUrl;
+
                 var response = await _container.CreateItemAsync(media, new PartitionKey(media.media_id));
 
                 return response.Resource;
@@ -97,6 +109,15 @@ namespace link_up.Services
         {
             try
             {
+                Media? media = await GetMediaByIdAsync(mediaId);
+                if (media != null)
+                {
+                    // on récupère le nom du fichier
+                    string fileName = Path.GetFileName(media.PathToFile);
+
+                    // on supprime le blob lié
+                    await this._blobService.DeleteFileAsync(fileName);
+                }
                 await _container.DeleteItemAsync<Media>(mediaId.ToString(), new PartitionKey(this._mediaPartitionKey));
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)

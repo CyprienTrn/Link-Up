@@ -70,7 +70,7 @@ namespace link_up.Services
                 {
                     foreach (var media in content.medias)
                     {
-                        this._mediaService.CreateMediaAsync(media, content.id);
+                        await this._mediaService.CreateMediaAsync(media, content.id);
                     }
                 }
 
