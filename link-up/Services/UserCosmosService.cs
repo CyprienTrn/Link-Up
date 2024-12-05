@@ -112,7 +112,6 @@ namespace link_up.Services
                     throw new InvalidOperationException("L'email saisi n'est pas valide");
                 }
 
-
                 user.CreatedAt = DateTime.UtcNow;
                 var response = await _container.CreateItemAsync(user, new PartitionKey(user.user_id));
 

@@ -12,8 +12,10 @@ namespace link_up.Models
         public string media_id { get; set; } = string.Empty;
         [JsonIgnore]
         public string ContentId { get; set; } = string.Empty;
-        public string MediaUrl { get; set; } = string.Empty;
-        public string MediaType { get; set; } = string.Empty;
+        public string? MediaUrl { get; set; } = string.Empty;
+        [JsonIgnore]
+        public string? MediaType { get; set; } = string.Empty;
+        public string PathToFile { get; set; } = string.Empty;
 
         [JsonIgnore]
         public DateTime UploadedAt { get; set; }

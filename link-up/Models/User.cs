@@ -14,6 +14,6 @@ namespace link_up.Models
         public string Name { get; set; } = string.Empty;
         public bool IsPrivate { get; set; }
         [JsonIgnore]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
